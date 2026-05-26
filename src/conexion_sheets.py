@@ -34,6 +34,27 @@ def conectar_google_sheets():
 
 
 @st.cache_data(ttl=300)
+def obtener_proximos_partidos():
+    hoja = conectar_google_sheets()
+    if not hoja:
+        return []
+    try:
+        registros = hoja.worksheet("Fixture").get_all_records()
+        df = pd.DataFrame(registros)
+        df["Fecha_Limite"] = pd.to_datetime(df["Fecha_Limite"]).dt.tz_localize("UTC")
+
+        ahora_utc = datetime.now(timezone.utc)
+        df = df[df["Fecha_Limite"] >= ahora_utc].copy()
+        df = df.sort_values("Fecha_Limite")
+        df["hora_utc"] = df["Fecha_Limite"].dt.strftime("%H:%M")
+        df["fecha_utc"] = df["Fecha_Limite"].dt.strftime("%Y-%m-%d")
+        df["fecha_legible"] = df["Fecha_Limite"].dt.strftime("%d %b %Y")
+        return df.to_dict(orient="records")
+    except Exception:
+        return []
+
+
+@st.cache_data(ttl=300)
 def obtener_partidos_activos():
     hoja = conectar_google_sheets()
     if not hoja:
@@ -66,6 +87,18 @@ def obtener_datos_hoja(hoja, nombre_pestana="Apuestas"):
     except Exception as e:
         st.error(f"Error leyendo datos de '{nombre_pestana}': {e}")
         return []
+
+
+@st.cache_data(ttl=600)
+def obtener_usuarios():
+    hoja = conectar_google_sheets()
+    if not hoja:
+        return pd.DataFrame(columns=["Nombre", "Pais", "Bandera", "PIN"])
+    try:
+        registros = hoja.worksheet("Usuarios").get_all_records()
+        return pd.DataFrame(registros)
+    except Exception:
+        return pd.DataFrame(columns=["Nombre", "Pais", "Bandera", "PIN"])
 
 
 def agregar_fila(hoja, datos, nombre_pestana="Apuestas"):

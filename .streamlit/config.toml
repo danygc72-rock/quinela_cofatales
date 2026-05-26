@@ -12,5 +12,4 @@ enableXsrfProtection = true
 [browser]
 gatherUsageStats = false
 
-[global]
-developerMode = false
+

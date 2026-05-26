@@ -68,4 +68,4 @@ def renderizar_leaderboard(hoja):
         ]
     )
 
-    st.dataframe(df_estilo, use_container_width=True, height=400)
+    st.dataframe(df_estilo, width="stretch", height=400)

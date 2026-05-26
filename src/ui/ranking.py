@@ -1,12 +1,19 @@
 import streamlit as st
 import pandas as pd
-from src.conexion_sheets import obtener_datos_hoja
+from src.conexion_sheets import obtener_datos_hoja, obtener_usuarios
 from src.calculos_puntos import calcular_puntos
 
 MEDALLAS = {1: "🥇", 2: "🥈", 3: "🥉"}
 
 
-def _renderizar_podio(ranking, usuario_actual):
+def _cargar_banderas():
+    df = obtener_usuarios()
+    if df.empty:
+        return {}
+    return dict(zip(df["Nombre"], df["Bandera"]))
+
+
+def _renderizar_podio(ranking, usuario_actual, banderas):
     if len(ranking) == 0:
         return
     st.subheader("🏆 Podio")
@@ -20,6 +27,7 @@ def _renderizar_podio(ranking, usuario_actual):
         pos = i + 1
         nombre = fila["Usuario"]
         puntos = int(fila["Puntos"])
+        bandera = banderas.get(nombre, "")
         es_usuario = nombre == usuario_actual
         with col:
             st.markdown(
@@ -31,8 +39,11 @@ def _renderizar_podio(ranking, usuario_actual):
                     {'transform: scale(1.05);' if pos == 1 else ''}
                 ">
                     <div style="font-size: 2.5rem;">{MEDALLAS.get(pos, "")}</div>
-                    <div style="font-size: 1.5rem; font-weight: 900; color: #00FF41;">
+                    <div style="font-size: 1.5rem; font-weight: 900; color: #D4AF37;">
                         {puntos}
+                    </div>
+                    <div style="font-size: 1.3rem; margin-top: 2px;">
+                        {bandera}
                     </div>
                     <div style="font-size: 0.9rem; font-weight: {'700' if es_usuario else '400'};
                          color: {'#FFFFFF' if es_usuario else '#CCC'};
@@ -107,17 +118,19 @@ def renderizar_ranking(hoja):
     df.index = df.index + 1
     df.index.name = "Pos"
 
+    banderas = _cargar_banderas()
+
     if not df.empty and df.iloc[0]["Puntos"] > 0:
         st.balloons()
 
-    _renderizar_podio(df, st.session_state.get("usuario_actual", ""))
+    _renderizar_podio(df, st.session_state.get("usuario_nombre", ""), banderas)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
     def _estilo_fila(row):
         idx = row.name
         es_leader = idx == 1
-        usuario = st.session_state.get("usuario_actual", "")
+        usuario = st.session_state.get("usuario_nombre", "")
         es_usuario = row["Usuario"] == usuario
         estilo = []
         if es_leader:
@@ -127,6 +140,7 @@ def renderizar_ranking(hoja):
         return estilo
 
     df_display = df.copy()
+    df_display.insert(0, "", df_display["Usuario"].map(banderas).fillna(""))
     df_display["Puntos"] = df_display["Puntos"].astype(int)
     df_display["Exactos"] = df_display["Exactos"].astype(int)
 
@@ -146,13 +160,13 @@ def renderizar_ranking(hoja):
                     "selector": "th",
                     "props": [
                         ("background-color", "#1e2329"),
-                        ("color", "#00FF41"),
+                        ("color", "#D4AF37"),
                         ("text-align", "center"),
-                        ("border-bottom", "2px solid #00FF41"),
+                        ("border-bottom", "2px solid #D4AF37"),
                     ],
                 },
             ]
         )
     )
 
-    st.dataframe(df_estilo, use_container_width=True, height=400)
+    st.dataframe(df_estilo, width="stretch", height=400)

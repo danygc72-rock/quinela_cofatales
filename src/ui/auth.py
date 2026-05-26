@@ -1,16 +1,31 @@
 import streamlit as st
-from src.config import USUARIOS_PERMITIDOS
+
+from src.conexion_sheets import obtener_usuarios
 
 
 def renderizar_autenticacion():
+    df_usuarios = obtener_usuarios()
+    if df_usuarios.empty:
+        st.error("No se pudo cargar la lista de usuarios.")
+        return None
+
+    opciones = [
+        f"{row['Nombre']} {row['Bandera']}"
+        for _, row in df_usuarios.iterrows()
+    ]
+    opciones.insert(0, "Selecciona tu nombre...")
+
     st.subheader("Seleccioná tu nombre")
-    usuario = st.selectbox(
+    seleccion = st.selectbox(
         "¿Quién está apostando?",
-        options=USUARIOS_PERMITIDOS,
+        options=opciones,
         index=0,
         key="usuario_actual",
     )
-    if usuario == USUARIOS_PERMITIDOS[0]:
+
+    if seleccion == opciones[0]:
         st.warning("Seleccioná un nombre para empezar.")
         return None
-    return usuario
+
+    nombre_limpio = seleccion.rsplit(" ", 1)[0]
+    return nombre_limpio

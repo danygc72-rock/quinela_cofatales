@@ -7,7 +7,7 @@ def aplicar_estilos_modernos():
         <style>
         .match-card {
             border-radius: 15px;
-            border-left: 5px solid #00FF41;
+            border-left: 5px solid #D4AF37;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             padding: 20px;
             margin: 10px 0;
@@ -17,10 +17,10 @@ def aplicar_estilos_modernos():
         .match-card:hover {
             transform: translateY(-4px);
             border-left-color: #FFD700;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
         }
         .titulo-mundial {
-            background: linear-gradient(135deg, #00FF41 0%, #FFD700 100%);
+            background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #D4AF37 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -28,7 +28,7 @@ def aplicar_estilos_modernos():
             font-size: 2.5rem;
         }
         div.stButton > button {
-            background: linear-gradient(135deg, #00FF41 0%, #00cc33 100%) !important;
+            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%) !important;
             color: #0e1117 !important;
             font-weight: 700 !important;
             text-transform: uppercase !important;
@@ -39,7 +39,7 @@ def aplicar_estilos_modernos():
         }
         div.stButton > button:hover {
             transform: scale(1.03);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
         }
         </style>
         """,
