@@ -2,27 +2,31 @@ name: Actualizar Fixture Quinela
 
 on:
   schedule:
-    - cron: "0 */3 * *"
-  workflow_dispatch:
+    - cron: "0 */3 * * *"  # Se corrigió a 5 campos (Cada 3 horas)
+  workflow_dispatch:      # Esto activa el botón para ejecutarlo manual
 
 jobs:
-  sincronizar:
+  actualizar:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout código
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Configurar Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-          cache: pip
+          python-version: '3.12'
 
-      - run: pip install -r requirements.txt
-
-      - name: Generar .streamlit/secrets.toml
+      - name: Instalar dependencias
         run: |
-          mkdir -p .streamlit
+          pip install -r requirements.txt
+
+      - name: Crear carpeta .streamlit
+        run: mkdir -p .streamlit
+
+      - name: Inyectar Secrets
+        run: |
           echo "${{ secrets.STREAMLIT_SECRETS_TOML }}" > .streamlit/secrets.toml
 
-      - name: Ejecutar sincronización del fixture
+      - name: Ejecutar Sincronización
         run: python scripts/sincronizar_fixture_api.py
