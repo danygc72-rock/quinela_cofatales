@@ -52,7 +52,9 @@ def obtener_partidos_activos():
             & (df["Fecha_Limite"] > ahora_utc)
             & (df["Estado"] != "Terminado")
         ]
-        return (df["Equipo_A"] + " vs " + df["Equipo_B"]).tolist()
+        df["hora_utc"] = df["Fecha_Limite"].dt.strftime("%H:%M")
+        df["fecha_utc"] = df["Fecha_Limite"].dt.strftime("%Y-%m-%d %H:%M")
+        return df.to_dict(orient="records")
     except Exception:
         return []
 

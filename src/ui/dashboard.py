@@ -1,10 +1,53 @@
+from datetime import datetime, timezone
+
 import streamlit as st
+
 from src.conexion_sheets import agregar_fila, obtener_partidos_activos
 from src.services.ai_service import obtener_prediccion
 
+BANDERAS = {
+    "Algeria": "🇩🇿", "Argentina": "🇦🇷", "Australia": "🇦🇺", "Austria": "🇦🇹",
+    "Belgium": "🇧🇪", "Bosnia-Herzegovina": "🇧🇦", "Brazil": "🇧🇷",
+    "Canada": "🇨🇦", "Cape Verde Islands": "🇨🇻", "Colombia": "🇨🇴",
+    "Congo DR": "🇨🇩", "Croatia": "🇭🇷", "Curaçao": "🇨🇼", "Czechia": "🇨🇿",
+    "Ecuador": "🇪🇨", "Egypt": "🇪🇬", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    "France": "🇫🇷", "Germany": "🇩🇪", "Ghana": "🇬🇭", "Haiti": "🇭🇹",
+    "Iran": "🇮🇷", "Iraq": "🇮🇶", "Ivory Coast": "🇨🇮",
+    "Japan": "🇯🇵", "Jordan": "🇯🇴", "Mexico": "🇲🇽", "Morocco": "🇲🇦",
+    "Netherlands": "🇳🇱", "New Zealand": "🇳🇿", "Norway": "🇳🇴",
+    "Panama": "🇵🇦", "Paraguay": "🇵🇾", "Portugal": "🇵🇹",
+    "Qatar": "🇶🇦", "Saudi Arabia": "🇸🇦", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+    "Senegal": "🇸🇳", "South Africa": "🇿🇦", "South Korea": "🇰🇷",
+    "Spain": "🇪🇸", "Sweden": "🇸🇪", "Switzerland": "🇨🇭",
+    "Tunisia": "🇹🇳", "Turkey": "🇹🇷", "United States": "🇺🇸",
+    "Uruguay": "🇺🇾", "Uzbekistan": "🇺🇿",
+}
+
+
+def _bandera(pais):
+    return BANDERAS.get(pais, "🏳️")
+
+
+def _renderizar_countdown():
+    inicio_mundial = datetime(2026, 6, 11, tzinfo=timezone.utc)
+    ahora = datetime.now(timezone.utc)
+    if ahora >= inicio_mundial:
+        st.sidebar.metric("Mundial 2026", "¡En marcha!")
+        return
+    dias = (inicio_mundial - ahora).days
+    horas = int((inicio_mundial - ahora).seconds / 3600)
+    st.sidebar.metric("Cuenta regresiva", f"{dias} días")
+    st.sidebar.caption(f"{horas}h hasta el primer partido")
+
 
 def renderizar_dashboard(hoja, usuario):
-    st.subheader(f"Pronosticá el partido de hoy, {usuario}")
+    _renderizar_countdown()
+
+    st.markdown(
+        '<h1 class="titulo-mundial">CO-FATALES 2026</h1>',
+        unsafe_allow_html=True,
+    )
+    st.caption("Los horarios están en UTC. Las apuestas se cierran al inicio oficial del partido.")
 
     partidos = obtener_partidos_activos()
 
@@ -12,47 +55,69 @@ def renderizar_dashboard(hoja, usuario):
         st.info("⚽ No hay partidos abiertos para pronósticos en este momento. ¡Atento a la próxima jornada!")
         return
 
-    opciones = ["Selecciona un partido..."] + partidos
+    for partido in partidos:
+        eq_a = partido["Equipo_A"]
+        eq_b = partido["Equipo_B"]
+        hora = partido.get("hora_utc", "--:--")
 
-    seleccion = st.selectbox(
-        "Seleccioná un partido",
-        options=opciones,
-        index=0,
-        key="partido_seleccionado",
-    )
+        st.markdown(
+            f"""
+            <div class="match-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 1.8rem;">
+                        {_bandera(eq_a)} {eq_a}
+                        <span style="color: #FFD700; margin: 0 12px;">vs</span>
+                        {eq_b} {_bandera(eq_b)}
+                    </div>
+                    <div style="color: #00FF41; font-weight: 700; font-size: 1.1rem;">
+                        🕐 {hora} UTC
+                    </div>
+                </div>
+                <div style="color: #888; font-size: 0.85rem; margin-top: 6px;">
+                    🏟️ Estadio Mundial 2026
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-    st.caption("Los horarios están en UTC. Las apuestas se cierran al inicio oficial del partido.")
-
-    if seleccion == opciones[0]:
-        st.info("Elegí un partido para pronosticar.")
-        return
-
-    equipos = seleccion.split(" vs ")
-    equipo_a = equipos[0].strip()
-    equipo_b = equipos[1].strip()
-
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Local", equipo_a)
-        goles_a = st.number_input("Goles", min_value=0, max_value=20, step=1, key="gol_a")
-    with col2:
-        st.metric("Visitante", equipo_b)
-        goles_b = st.number_input("Goles", min_value=0, max_value=20, step=1, key="gol_b")
-
-    if st.button("Enviar apuesta", type="primary", use_container_width=True):
-        datos = [usuario, equipo_a.upper(), equipo_b.upper(), goles_a, goles_b]
-        if agregar_fila(hoja, datos):
-            st.success("Apuesta registrada correctamente!")
-            st.balloons()
-        else:
-            st.error("No se pudo guardar la apuesta.")
+        col_a, col_b, col_btn = st.columns([1, 1, 2])
+        with col_a:
+            goles_a = st.number_input(
+                f"{eq_a}", min_value=0, max_value=20, step=1,
+                key=f"gol_a_{partido['ID']}",
+            )
+        with col_b:
+            goles_b = st.number_input(
+                f"{eq_b}", min_value=0, max_value=20, step=1,
+                key=f"gol_b_{partido['ID']}",
+            )
+        with col_btn:
+            st.write("")
+            st.write("")
+            if st.button(
+                "Guardar Pronóstico",
+                type="primary",
+                use_container_width=True,
+                key=f"btn_{partido['ID']}",
+            ):
+                datos = [usuario, eq_a.upper(), eq_b.upper(), goles_a, goles_b]
+                if agregar_fila(hoja, datos):
+                    st.success("Apuesta registrada correctamente!")
+                    st.balloons()
+                else:
+                    st.error("No se pudo guardar la apuesta.")
 
     st.divider()
     with st.expander("Preguntarle a la IA"):
+        todos = " - ".join(
+            f"{p['Equipo_A']} vs {p['Equipo_B']}"
+            for p in partidos
+        )
         if st.button("El Oráculo", type="secondary", use_container_width=True):
             with st.spinner("El Oráculo está consultando los astros..."):
                 try:
-                    prediccion = obtener_prediccion(seleccion)
+                    prediccion = obtener_prediccion(todos)
                     st.success(prediccion)
                 except (ConnectionError, RuntimeError) as e:
                     st.error(str(e))

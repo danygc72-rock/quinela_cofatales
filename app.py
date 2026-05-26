@@ -12,9 +12,11 @@ from src.ui.auth import renderizar_autenticacion
 from src.ui.dashboard import renderizar_dashboard
 from src.ui.oraculo import renderizar_oraculo
 from src.ui.ranking import renderizar_ranking
+from src.ui.estilos import aplicar_estilos_modernos
 
 
 def main():
+    aplicar_estilos_modernos()
     st.title("⚽ Quinela Co-fatales 2026")
     st.caption("Mundial 2026 — La apuesta de los amigos")
 

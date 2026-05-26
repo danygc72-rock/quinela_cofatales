@@ -1,6 +1,6 @@
 def calcular_puntos(apuesta_a, apuesta_b, real_a, real_b):
     if apuesta_a == real_a and apuesta_b == real_b:
-        return 5
+        return 5, True
 
     def _signo(goles_a, goles_b):
         if goles_a > goles_b:
@@ -10,6 +10,6 @@ def calcular_puntos(apuesta_a, apuesta_b, real_a, real_b):
         return "empate"
 
     if _signo(apuesta_a, apuesta_b) == _signo(real_a, real_b):
-        return 3
+        return 3, False
 
-    return 0
+    return 0, False
