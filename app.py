@@ -11,7 +11,7 @@ from src.conexion_sheets import conectar_google_sheets
 from src.ui.auth import renderizar_autenticacion
 from src.ui.dashboard import renderizar_dashboard
 from src.ui.oraculo import renderizar_oraculo
-from src.ui.leaderboard import renderizar_leaderboard
+from src.ui.ranking import renderizar_ranking
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
 
     pestana = st.selectbox(
         "Navegación",
-        options=["Dashboard", "Oráculo IA", "Leaderboard"],
+        options=["Dashboard", "Oráculo IA", "Ranking"],
         key="navegacion",
     )
 
@@ -41,8 +41,8 @@ def main():
         renderizar_dashboard(hoja, usuario)
     elif pestana == "Oráculo IA":
         renderizar_oraculo()
-    elif pestana == "Leaderboard":
-        renderizar_leaderboard(hoja)
+    elif pestana == "Ranking":
+        renderizar_ranking(hoja)
 
     st.divider()
     st.caption("Hecho con ❤️ para la co-fatales")

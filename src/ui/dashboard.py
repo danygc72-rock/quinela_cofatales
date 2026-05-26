@@ -21,6 +21,8 @@ def renderizar_dashboard(hoja, usuario):
         key="partido_seleccionado",
     )
 
+    st.caption("Los horarios están en UTC. Las apuestas se cierran al inicio oficial del partido.")
+
     if seleccion == opciones[0]:
         st.info("Elegí un partido para pronosticar.")
         return

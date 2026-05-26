@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 import gspread
 import pandas as pd
@@ -41,9 +41,15 @@ def obtener_partidos_activos():
     try:
         registros = hoja.worksheet("Fixture").get_all_records()
         df = pd.DataFrame(registros)
-        df["Fecha_Limite"] = pd.to_datetime(df["Fecha_Limite"])
+        df["Fecha_Limite"] = (
+            pd.to_datetime(df["Fecha_Limite"])
+            .dt.tz_localize("UTC")
+        )
+
+        ahora_utc = datetime.now(timezone.utc)
         df = df[
-            (df["Fecha_Limite"] > datetime.now())
+            (df["Fecha_Limite"].dt.date == ahora_utc.date())
+            & (df["Fecha_Limite"] > ahora_utc)
             & (df["Estado"] != "Terminado")
         ]
         return (df["Equipo_A"] + " vs " + df["Equipo_B"]).tolist()
