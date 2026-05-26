@@ -8,7 +8,8 @@ from src.conexion_sheets import (
     obtener_proximos_partidos,
     obtener_usuarios,
 )
-from src.services.ai_service import obtener_prediccion
+from src.calculos_puntos import calcular_tabla
+from src.oraculo_ia import obtener_prediccion_oraculo
 
 BANDERAS = {
     "Algeria": "🇩🇿", "Argentina": "🇦🇷", "Australia": "🇦🇺", "Austria": "🇦🇹",
@@ -289,7 +290,8 @@ def renderizar_dashboard(hoja):
         if st.button("El Oráculo", type="secondary", use_container_width=True):
             with st.spinner("El Oráculo está consultando los astros..."):
                 try:
-                    prediccion = obtener_prediccion(todos)
+                    ranking = calcular_tabla(hoja)
+                    prediccion = obtener_prediccion_oraculo(todos, ranking)
                     st.success(prediccion)
                 except (ConnectionError, RuntimeError) as e:
                     st.error(str(e))

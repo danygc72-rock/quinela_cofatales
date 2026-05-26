@@ -45,7 +45,7 @@ def main():
     if pestana == "Dashboard":
         renderizar_dashboard(hoja)
     elif pestana == "Oráculo IA":
-        renderizar_oraculo()
+        renderizar_oraculo(hoja)
     elif pestana == "Ranking":
         renderizar_ranking(hoja)
 
