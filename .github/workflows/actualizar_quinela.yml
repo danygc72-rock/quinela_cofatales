@@ -29,4 +29,4 @@ jobs:
           echo "${{ secrets.STREAMLIT_SECRETS_TOML }}" > .streamlit/secrets.toml
 
       - name: Ejecutar Sincronización
-        run: python scripts/sincronizar_fixture_api.py
+        run: python3 scripts/sincronizar_fixture_api.py
