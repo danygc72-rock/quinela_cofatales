@@ -170,59 +170,47 @@ def renderizar_dashboard(hoja):
 
     proximos = obtener_proximos_partidos()
     if proximos:
-        fecha = proximos[0]["fecha_legible"]
         st.markdown(
-            f"""
-            <div style="text-align: center; margin-bottom: 8px;">
-                <span style="color: #D4AF37; font-weight: 700; font-size: 0.9rem;
-                      letter-spacing: 1px;">📅 PRÓXIMA JORNADA — {fecha.upper()}</span>
-            </div>
-            """,
+            '<div style="text-align: center; margin-bottom: 10px;">'
+            '<span style="color: #D4AF37; font-weight: 700; font-size: 0.9rem; letter-spacing: 1px;">📅 PRÓXIMOS PARTIDOS</span>'
+            '</div>',
             unsafe_allow_html=True,
         )
-        for i in range(0, len(proximos), 2):
-            cols = st.columns(2)
-            for j in range(2):
-                idx = i + j
-                if idx >= len(proximos):
-                    with cols[j]:
-                        st.write("")
-                    continue
-                p = proximos[idx]
-                with cols[j]:
-                    st.markdown(
-                        f"""
-                        <div style="background: linear-gradient(135deg, #1e2329 0%, #151a20 100%);
-                             border-radius: 14px; padding: 14px 12px; margin: 6px 0;
-                             border: 1px solid #2a2a2a; text-align: center;
-                             box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-                             transition: all 0.2s;">
-                            <div style="font-size: 1.4rem; margin-bottom: 6px;">
-                                {_bandera(p['Equipo_A'])}
-                            </div>
-                            <div style="font-size: 0.85rem; font-weight: 600; color: #FAFAFA;
-                                 margin-bottom: 2px;">
-                                {p['Equipo_A']}
-                            </div>
-                            <div style="color: #D4AF37; font-weight: 800; font-size: 0.75rem;
-                                 margin: 4px 0; letter-spacing: 1px;">
-                                VS
-                            </div>
-                            <div style="font-size: 0.85rem; font-weight: 600; color: #FAFAFA;
-                                 margin-bottom: 2px;">
-                                {p['Equipo_B']}
-                            </div>
-                            <div style="font-size: 1.4rem; margin-bottom: 6px;">
-                                {_bandera(p['Equipo_B'])}
-                            </div>
-                            <div style="font-size: 0.7rem; color: #D4AF37; margin-top: 4px;
-                                 letter-spacing: 1px;">
-                                🕐 {p['hora_utc']} UTC
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
+        fecha_actual = None
+        for p in proximos:
+            if p["fecha_utc"] != fecha_actual:
+                fecha_actual = p["fecha_utc"]
+                st.markdown(
+                    f"""
+                    <div style="font-size: 0.75rem; color: #888; letter-spacing: 1px;
+                         margin: 8px 0 4px 0; text-align: center;">
+                        ── {p['fecha_legible'].upper()} ──
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            cols = st.columns([1, 4])
+            with cols[0]:
+                st.markdown(
+                    f'<div style="font-size: 1.2rem; text-align: center; padding-top: 8px;">{_bandera(p["Equipo_A"])} vs {_bandera(p["Equipo_B"])}</div>',
+                    unsafe_allow_html=True,
+                )
+            with cols[1]:
+                st.markdown(
+                    f"""
+                    <div style="background: #1a1f26; border-radius: 10px; padding: 8px 14px;
+                         border: 1px solid #2a2a2a; margin: 3px 0;
+                         display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: #FAFAFA;">
+                            {p['Equipo_A']} vs {p['Equipo_B']}
+                        </span>
+                        <span style="font-size: 0.75rem; color: #D4AF37; letter-spacing: 1px;">
+                            🕐 {p['hora_utc']} UTC
+                        </span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
         st.divider()
 
     usuario = _seleccionar_usuario()
