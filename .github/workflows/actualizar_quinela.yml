@@ -1,0 +1,28 @@
+name: Actualizar Fixture Quinela
+
+on:
+  schedule:
+    - cron: "0 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Generar .streamlit/secrets.toml
+        run: |
+          mkdir -p .streamlit
+          echo "${{ secrets.STREAMLIT_SECRETS_TOML }}" > .streamlit/secrets.toml
+
+      - name: Ejecutar sincronización del fixture
+        run: python scripts/sincronizar_fixture_api.py
