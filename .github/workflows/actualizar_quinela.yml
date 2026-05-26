@@ -25,8 +25,11 @@ jobs:
         run: mkdir -p .streamlit
 
       - name: Inyectar Secrets
+        shell: bash
+        env:
+          CONFIG_TOML: ${{ secrets.STREAMLIT_SECRETS_TOML }}
         run: |
-          echo "${{ secrets.STREAMLIT_SECRETS_TOML }}" > .streamlit/secrets.toml
+          echo "$CONFIG_TOML" > .streamlit/secrets.toml
 
       - name: Ejecutar Sincronización
         run: python3 scripts/sincronizar_fixture_api.py
