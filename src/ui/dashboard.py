@@ -34,28 +34,20 @@ def _bandera(pais):
 
 
 def _renderizar_countdown():
-    st.sidebar.markdown(
-        """
-        <div style="text-align: center; margin: 10px 0;">
-            <span style="font-size: 2.5rem;">⚽</span>
-            <div style="font-size: 0.85rem; color: #D4AF37; font-weight: 700; letter-spacing: 2px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.3);">
-                WORLD CUP 2026
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    st.sidebar.divider()
+    pass
+
+
+def renderizar_countdown_main():
     inicio_mundial = datetime(2026, 6, 11, tzinfo=timezone.utc)
     ahora = datetime.now(timezone.utc)
     if ahora >= inicio_mundial:
-        st.sidebar.markdown(
+        st.markdown(
             """
-            <div style="text-align: center; padding: 12px; background: #1e2329;
-                 border-radius: 12px; border: 1px solid #D4AF37;">
-                <span style="font-size: 1.8rem;">🏆</span>
-                <div style="color: #D4AF37; font-weight: 800; font-size: 1.1rem;">
-                    ¡Mundial en marcha!
+            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #1e2329, #151a20);
+                 border-radius: 16px; border: 1px solid #D4AF37; margin-bottom: 20px;">
+                <span style="font-size: 2.5rem;">🏆</span>
+                <div style="color: #D4AF37; font-weight: 800; font-size: 1.3rem; margin-top: 6px;">
+                    ¡Mundial 2026 en marcha!
                 </div>
             </div>
             """,
@@ -66,45 +58,55 @@ def _renderizar_countdown():
     horas = int((inicio_mundial - ahora).seconds / 3600)
     total_dias = (inicio_mundial - datetime(2025, 1, 1, tzinfo=timezone.utc)).days
     pct = max(0, min(100, (1 - dias / total_dias) * 100))
-    st.sidebar.markdown(
+    st.markdown(
         f"""
-        <div style="text-align: center; padding: 16px 12px; background: #1e2329;
-             border-radius: 14px; border: 1px solid #333;
-             box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
-            <div style="font-size: 0.7rem; color: #888; letter-spacing: 2px;
-                 text-transform: uppercase; margin-bottom: 8px;">
-                Cuenta regresiva
-            </div>
-            <div style="display: flex; justify-content: center; gap: 12px;">
-                <div style="background: #0e1117; border-radius: 10px; padding: 8px 14px;
-                     min-width: 60px; border: 1px solid #2a2a2a;">
-                    <div style="font-size: 1.8rem; font-weight: 900; color: #D4AF37;
-                         line-height: 1.2; text-shadow: 0 0 12px rgba(212, 175, 55, 0.3);">
-                        {dias}
+        <div style="background: linear-gradient(135deg, #1e2329 0%, #151a20 100%);
+             border-radius: 16px; padding: 20px; margin-bottom: 20px;
+             border: 1px solid #2a2a2a; box-shadow: 0 4px 24px rgba(0,0,0,0.4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div style="flex: 1; min-width: 120px;">
+                    <div style="font-size: 0.65rem; color: #888; letter-spacing: 2px;
+                         text-transform: uppercase; margin-bottom: 4px;">
+                        Cuenta regresiva
                     </div>
-                    <div style="font-size: 0.6rem; color: #888; letter-spacing: 1px;">
-                        DÍAS
+                    <div style="font-size: 0.85rem; color: #D4AF37; font-weight: 600;
+                         letter-spacing: 1px;">
+                        Mundial 2026
                     </div>
                 </div>
-                <div style="background: #0e1117; border-radius: 10px; padding: 8px 14px;
-                     min-width: 60px; border: 1px solid #2a2a2a;">
-                    <div style="font-size: 1.8rem; font-weight: 900; color: #D4AF37;
-                         line-height: 1.2; text-shadow: 0 0 12px rgba(212, 175, 55, 0.3);">
-                        {horas}
+                <div style="display: flex; gap: 16px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2.2rem; font-weight: 900; color: #D4AF37;
+                             line-height: 1.1; text-shadow: 0 0 16px rgba(212, 175, 55, 0.3);">
+                            {dias}
+                        </div>
+                        <div style="font-size: 0.6rem; color: #666; letter-spacing: 2px;">
+                            DÍAS
+                        </div>
                     </div>
-                    <div style="font-size: 0.6rem; color: #888; letter-spacing: 1px;">
-                        HORAS
+                    <div style="font-size: 2rem; color: #333; font-weight: 100; line-height: 1.8;">:</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2.2rem; font-weight: 900; color: #D4AF37;
+                             line-height: 1.1; text-shadow: 0 0 16px rgba(212, 175, 55, 0.3);">
+                            {horas}
+                        </div>
+                        <div style="font-size: 0.6rem; color: #666; letter-spacing: 2px;">
+                            HORAS
+                        </div>
                     </div>
                 </div>
             </div>
-            <div style="margin-top: 12px; background: #0e1117; border-radius: 20px;
+            <div style="margin-top: 14px; background: #0e1117; border-radius: 20px;
                  height: 6px; overflow: hidden; border: 1px solid #2a2a2a;">
                 <div style="width: {pct:.1f}%; height: 100%;
                      background: linear-gradient(90deg, #D4AF37, #FFD700);
-                     border-radius: 20px; transition: width 0.5s;"></div>
+                     border-radius: 20px;"></div>
             </div>
-            <div style="font-size: 0.65rem; color: #666; margin-top: 6px;">
-                {pct:.0f}% del camino
+            <div style="display: flex; justify-content: space-between; margin-top: 6px;
+                 font-size: 0.6rem; color: #555;">
+                <span>Inicio</span>
+                <span>{pct:.0f}%</span>
+                <span>11 Jun 2026</span>
             </div>
         </div>
         """,
@@ -168,29 +170,60 @@ def renderizar_dashboard(hoja):
 
     proximos = obtener_proximos_partidos()
     if proximos:
-        with st.expander("📅 Próximos partidos", expanded=False):
-            fecha_actual = None
-            for p in proximos:
-                if p["fecha_utc"] != fecha_actual:
-                    fecha_actual = p["fecha_utc"]
-                    st.markdown(f"**── {p['fecha_legible']} ──**")
-                st.markdown(
-                    f"""
-                    <div style="display: flex; justify-content: space-between;
-                         align-items: center; padding: 6px 12px;
-                         background: #1a1f26; border-radius: 8px; margin: 4px 0;">
-                        <span style="font-size: 1.1rem;">
-                            {_bandera(p['Equipo_A'])} {p['Equipo_A']}
-                            <span style="color: #FFD700; margin: 0 8px;">vs</span>
-                            {p['Equipo_B']} {_bandera(p['Equipo_B'])}
-                        </span>
-                        <span style="color: #D4AF37; font-size: 0.85rem;">
-                            🕐 {p['hora_utc']} UTC
-                        </span>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+        fecha = proximos[0]["fecha_legible"]
+        st.markdown(
+            f"""
+            <div style="text-align: center; margin-bottom: 8px;">
+                <span style="color: #D4AF37; font-weight: 700; font-size: 0.9rem;
+                      letter-spacing: 1px;">📅 PRÓXIMA JORNADA — {fecha.upper()}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        for i in range(0, len(proximos), 2):
+            cols = st.columns(2)
+            for j in range(2):
+                idx = i + j
+                if idx >= len(proximos):
+                    with cols[j]:
+                        st.write("")
+                    continue
+                p = proximos[idx]
+                with cols[j]:
+                    st.markdown(
+                        f"""
+                        <div style="background: linear-gradient(135deg, #1e2329 0%, #151a20 100%);
+                             border-radius: 14px; padding: 14px 12px; margin: 6px 0;
+                             border: 1px solid #2a2a2a; text-align: center;
+                             box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+                             transition: all 0.2s;">
+                            <div style="font-size: 1.4rem; margin-bottom: 6px;">
+                                {_bandera(p['Equipo_A'])}
+                            </div>
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #FAFAFA;
+                                 margin-bottom: 2px;">
+                                {p['Equipo_A']}
+                            </div>
+                            <div style="color: #D4AF37; font-weight: 800; font-size: 0.75rem;
+                                 margin: 4px 0; letter-spacing: 1px;">
+                                VS
+                            </div>
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #FAFAFA;
+                                 margin-bottom: 2px;">
+                                {p['Equipo_B']}
+                            </div>
+                            <div style="font-size: 1.4rem; margin-bottom: 6px;">
+                                {_bandera(p['Equipo_B'])}
+                            </div>
+                            <div style="font-size: 0.7rem; color: #D4AF37; margin-top: 4px;
+                                 letter-spacing: 1px;">
+                                🕐 {p['hora_utc']} UTC
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+        st.divider()
 
     usuario = _seleccionar_usuario()
     if not usuario:

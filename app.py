@@ -4,11 +4,11 @@ st.set_page_config(
     page_title="Quinela Co-fatales 2026",
     page_icon="⚽",
     layout="centered",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 from src.conexion_sheets import conectar_google_sheets
-from src.ui.dashboard import renderizar_dashboard
+from src.ui.dashboard import renderizar_countdown_main, renderizar_dashboard
 from src.ui.oraculo import renderizar_oraculo
 from src.ui.ranking import renderizar_ranking
 from src.ui.estilos import aplicar_estilos_modernos
@@ -21,6 +21,8 @@ def main():
 
     if not hoja:
         st.stop()
+
+    renderizar_countdown_main()
 
     st.image("assets/logo_mundial.png", width="stretch")
 

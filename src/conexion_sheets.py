@@ -46,6 +46,9 @@ def obtener_proximos_partidos():
         ahora_utc = datetime.now(timezone.utc)
         df = df[df["Fecha_Limite"] >= ahora_utc].copy()
         df = df.sort_values("Fecha_Limite")
+        dos_dias = df["Fecha_Limite"].dt.date.iloc[0] + pd.Timedelta(days=1) if not df.empty else None
+        if dos_dias is not None:
+            df = df[df["Fecha_Limite"].dt.date <= dos_dias]
         df["hora_utc"] = df["Fecha_Limite"].dt.strftime("%H:%M")
         df["fecha_utc"] = df["Fecha_Limite"].dt.strftime("%Y-%m-%d")
         df["fecha_legible"] = df["Fecha_Limite"].dt.strftime("%d %b %Y")
