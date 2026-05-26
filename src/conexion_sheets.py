@@ -1,5 +1,8 @@
 import json
+from datetime import datetime
+
 import gspread
+import pandas as pd
 from oauth2client.service_account import ServiceAccountCredentials
 import streamlit as st
 from src.config import ID_SHEET, ALCANCE
@@ -28,6 +31,24 @@ def conectar_google_sheets():
     except Exception as e:
         st.error(f"Error conectando con Google Sheets: {e}")
         return None
+
+
+@st.cache_data(ttl=300)
+def obtener_partidos_activos():
+    hoja = conectar_google_sheets()
+    if not hoja:
+        return []
+    try:
+        registros = hoja.worksheet("Fixture").get_all_records()
+        df = pd.DataFrame(registros)
+        df["Fecha_Limite"] = pd.to_datetime(df["Fecha_Limite"])
+        df = df[
+            (df["Fecha_Limite"] > datetime.now())
+            & (df["Estado"] != "Terminado")
+        ]
+        return (df["Equipo_A"] + " vs " + df["Equipo_B"]).tolist()
+    except Exception:
+        return []
 
 
 def obtener_datos_hoja(hoja, nombre_pestana="Apuestas"):
