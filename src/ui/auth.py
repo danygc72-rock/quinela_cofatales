@@ -4,8 +4,9 @@ from src.conexion_sheets import obtener_usuarios
 
 
 def login(hoja):
+    st.image("assets/logo_mundial.png", width="stretch")
     st.markdown(
-        '<h1 class="titulo-mundial" style="text-align: center; font-size: 2rem;">⚽ CO-FATALES 2026</h1>',
+        '<h1 class="titulo-mundial" style="text-align: center; font-size: 2rem; margin-top: -10px;">CO-FATALES 2026</h1>',
         unsafe_allow_html=True,
     )
     st.caption("Mundial 2026 — La apuesta de los amigos")
