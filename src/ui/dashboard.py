@@ -239,7 +239,18 @@ def renderizar_dashboard(hoja):
                 try:
                     ranking = calcular_tabla(hoja)
                     prediccion = obtener_prediccion_oraculo(todos, ranking)
-                    st.success(prediccion)
+                    st.markdown(
+                        f"""
+                        <div style="background: #1a1f26; border: 1px solid #D4AF37;
+                             border-radius: 12px; padding: 20px; margin: 12px 0;
+                             box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+                             color: #FAFAFA; font-size: 0.95rem; line-height: 1.7;
+                             white-space: pre-wrap;">
+                            {prediccion}
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
                 except (ConnectionError, RuntimeError) as e:
                     st.error(str(e))
                 except Exception as e:
