@@ -4,10 +4,11 @@ st.set_page_config(
     page_title="Quinela Co-fatales 2026",
     page_icon="⚽",
     layout="centered",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 from src.conexion_sheets import conectar_google_sheets
+from src.ui.auth import login, renderizar_ticket, renderizar_sidebar_usuario
 from src.ui.dashboard import renderizar_countdown_main, renderizar_dashboard
 from src.ui.oraculo import renderizar_oraculo
 from src.ui.ranking import renderizar_ranking
@@ -18,9 +19,18 @@ def main():
     aplicar_estilos_modernos()
 
     hoja = conectar_google_sheets()
-
     if not hoja:
         st.stop()
+
+    if not st.session_state.get("autenticado"):
+        login(hoja)
+        return
+
+    if st.session_state.get("mostrar_ticket"):
+        renderizar_ticket()
+        return
+
+    renderizar_sidebar_usuario()
 
     renderizar_countdown_main()
 
@@ -34,13 +44,7 @@ def main():
 
     st.divider()
 
-    pestana = st.selectbox(
-        "Navegación",
-        options=["Dashboard", "Oráculo IA", "Ranking"],
-        key="navegacion",
-    )
-
-    st.divider()
+    pestana = st.session_state.get("navegacion", "Dashboard")
 
     if pestana == "Dashboard":
         renderizar_dashboard(hoja)

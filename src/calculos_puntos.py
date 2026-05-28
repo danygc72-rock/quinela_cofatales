@@ -1,20 +1,27 @@
 import pandas as pd
 
 
+def _signo(goles_a, goles_b):
+    if goles_a > goles_b:
+        return "local"
+    if goles_b > goles_a:
+        return "visita"
+    return "empate"
+
+
 def calcular_puntos(apuesta_a, apuesta_b, real_a, real_b):
     if apuesta_a == real_a and apuesta_b == real_b:
         return 5, True
 
-    def _signo(goles_a, goles_b):
-        if goles_a > goles_b:
-            return "local"
-        if goles_b > goles_a:
-            return "visita"
-        return "empate"
+    mismo_signo = _signo(apuesta_a, apuesta_b) == _signo(real_a, real_b)
+    un_gol_acertado = (apuesta_a == real_a) or (apuesta_b == real_b)
 
-    if _signo(apuesta_a, apuesta_b) == _signo(real_a, real_b):
+    if mismo_signo and un_gol_acertado:
         return 3, False
-
+    if mismo_signo:
+        return 2, False
+    if un_gol_acertado:
+        return 1, False
     return 0, False
 
 

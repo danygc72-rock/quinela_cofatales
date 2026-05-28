@@ -6,7 +6,6 @@ from src.conexion_sheets import (
     agregar_fila,
     obtener_partidos_activos,
     obtener_proximos_partidos,
-    obtener_usuarios,
 )
 from src.calculos_puntos import calcular_tabla
 from src.oraculo_ia import obtener_prediccion_oraculo
@@ -32,10 +31,6 @@ BANDERAS = {
 
 def _bandera(pais):
     return BANDERAS.get(pais, "🏳️")
-
-
-def _renderizar_countdown():
-    pass
 
 
 def renderizar_countdown_main():
@@ -115,58 +110,7 @@ def renderizar_countdown_main():
     )
 
 
-def _seleccionar_usuario():
-    df_usuarios = obtener_usuarios()
-    if df_usuarios.empty:
-        st.error("No se pudo cargar la lista de usuarios.")
-        return None
-
-    df_usuarios = df_usuarios.sort_values("Nombre").reset_index(drop=True)
-    opciones = [
-        f"{row['Nombre']} {row['Bandera']}"
-        for _, row in df_usuarios.iterrows()
-    ]
-    placeholder = "Selecciona tu nombre..."
-    opciones.insert(0, placeholder)
-
-    seleccion = st.selectbox(
-        "¿Quién está apostando?",
-        options=opciones,
-        index=0,
-        key="usuario_actual",
-    )
-
-    if seleccion == placeholder:
-        st.warning("Seleccioná tu nombre para empezar.")
-        return None
-
-    nombre_limpio = seleccion.rsplit(" ", 1)[0]
-    st.session_state.usuario_nombre = nombre_limpio
-    return nombre_limpio
-
-
-def _pin_correcto(usuario):
-    df_usuarios = obtener_usuarios()
-    if df_usuarios.empty:
-        return False
-    match = df_usuarios[df_usuarios["Nombre"] == usuario]
-    if match.empty:
-        return False
-    pin_real = str(match.iloc[0]["PIN"]).strip()
-    pin_ingresado = st.text_input(
-        "🔐 PIN de Acceso",
-        type="password",
-        key="pin_dashboard",
-        placeholder="Ingresá tu PIN de 4 dígitos",
-    )
-    if not pin_ingresado:
-        return False
-    return pin_ingresado.strip() == pin_real
-
-
 def renderizar_dashboard(hoja):
-    _renderizar_countdown()
-
     st.caption("🏟️ Los horarios están en UTC. Las apuestas se cierran al inicio oficial del partido.")
 
     proximos = obtener_proximos_partidos()
@@ -214,19 +158,22 @@ def renderizar_dashboard(hoja):
                 )
         st.divider()
 
-    usuario = _seleccionar_usuario()
+    usuario = st.session_state.get("usuario_nombre", "")
     if not usuario:
-        return
-
-    if not _pin_correcto(usuario):
-        st.warning("PIN incorrecto. Ingresá el PIN correcto para hacer apuestas.")
+        st.warning("No se encontró usuario autenticado.")
         return
 
     partidos = obtener_partidos_activos()
 
     if not partidos:
-        st.info("⚽ No hay partidos abiertos para pronósticos en este momento. ¡Atento a la próxima jornada!")
-        return
+        partidos = proximos or []
+        if partidos:
+            st.info("📋 No hay partidos para hoy. Puedes pronosticar los **próximos partidos** con anticipación.")
+        else:
+            st.info("⚽ No hay partidos disponibles para pronósticos en este momento. ¡Atento a la próxima jornada!")
+            return
+
+    es_futuro = not obtener_partidos_activos()
 
     for partido in partidos:
         eq_a = partido["Equipo_A"]
@@ -247,7 +194,7 @@ def renderizar_dashboard(hoja):
                     </div>
                 </div>
                 <div style="color: #888; font-size: 0.85rem; margin-top: 6px;">
-                    🏟️ Estadio Mundial 2026
+                    {'🗓️ Pronóstico anticipado' if es_futuro else '🏟️ Estadio Mundial 2026'}
                 </div>
             </div>
             """,

@@ -74,70 +74,78 @@ def renderizar_ranking(hoja):
     df_fixture = pd.DataFrame(fixture_raw)
 
     df_fixture = df_fixture[df_fixture["Estado"] == "Terminado"].copy()
+    banderas = _cargar_banderas()
+
     if df_fixture.empty:
-        st.info("Todavía no hay partidos terminados. Los puntajes se calcularán automáticamente cuando finalicen.")
-        return
+        st.info("⏳ Sin partidos finalizados aún — la tabla se actualizará automáticamente cuando haya resultados.")
+        df_usuarios = obtener_usuarios()
+        if df_usuarios.empty:
+            return
+        df = pd.DataFrame({
+            "Usuario": df_usuarios["Nombre"].sort_values(),
+            "Puntos": 0,
+            "Exactos": 0,
+        }).reset_index(drop=True)
+        mostrar_podio = False
+    else:
+        cruzados = []
+        for _, apuesta in df_apuestas.iterrows():
+            equipo_a = apuesta["Equipo A"]
+            equipo_b = apuesta["Equipo B"]
+            goles_a = apuesta["Goles A"]
+            goles_b = apuesta["Goles B"]
 
-    cruzados = []
-    for _, apuesta in df_apuestas.iterrows():
-        equipo_a = apuesta["Equipo A"]
-        equipo_b = apuesta["Equipo B"]
-        goles_a = apuesta["Goles A"]
-        goles_b = apuesta["Goles B"]
+            match = df_fixture[
+                (df_fixture["Equipo_A"] == equipo_a)
+                & (df_fixture["Equipo_B"] == equipo_b)
+            ]
 
-        match = df_fixture[
-            (df_fixture["Equipo_A"] == equipo_a)
-            & (df_fixture["Equipo_B"] == equipo_b)
-        ]
+            if match.empty:
+                continue
 
-        if match.empty:
-            continue
+            for _, partido in match.iterrows():
+                real_a = partido["Goles_A_Real"]
+                real_b = partido["Goles_B_Real"]
+                puntos, exacto = calcular_puntos(goles_a, goles_b, real_a, real_b)
+                cruzados.append({
+                    "Usuario": apuesta["Nombre"],
+                    "Puntos": puntos,
+                    "Exacto": 1 if exacto else 0,
+                })
 
-        for _, partido in match.iterrows():
-            real_a = partido["Goles_A_Real"]
-            real_b = partido["Goles_B_Real"]
-            puntos, exacto = calcular_puntos(goles_a, goles_b, real_a, real_b)
-            cruzados.append({
-                "Usuario": apuesta["Nombre"],
-                "Puntos": puntos,
-                "Exacto": 1 if exacto else 0,
-            })
+        if not cruzados:
+            st.info("No hay coincidencias entre apuestas y resultados.")
+            return
 
-    if not cruzados:
-        st.info("No hay coincidencias entre apuestas y resultados.")
-        return
-
-    df = (
-        pd.DataFrame(cruzados)
-        .groupby("Usuario")
-        .agg(Puntos=("Puntos", "sum"), Exactos=("Exacto", "sum"))
-        .reset_index()
-        .sort_values(["Puntos", "Exactos"], ascending=[False, False])
-        .reset_index(drop=True)
-    )
+        df = (
+            pd.DataFrame(cruzados)
+            .groupby("Usuario")
+            .agg(Puntos=("Puntos", "sum"), Exactos=("Exacto", "sum"))
+            .reset_index()
+            .sort_values(["Puntos", "Exactos"], ascending=[False, False])
+            .reset_index(drop=True)
+        )
+        mostrar_podio = True
     df.index = df.index + 1
     df.index.name = "Pos"
 
-    banderas = _cargar_banderas()
-
-    if not df.empty and df.iloc[0]["Puntos"] > 0:
+    if mostrar_podio and not df.empty and df.iloc[0]["Puntos"] > 0:
         st.balloons()
-
-    _renderizar_podio(df, st.session_state.get("usuario_nombre", ""), banderas)
+        _renderizar_podio(df, st.session_state.get("usuario_nombre", ""), banderas)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
     def _estilo_fila(row):
         idx = row.name
-        es_leader = idx == 1
-        usuario = st.session_state.get("usuario_nombre", "")
-        es_usuario = row["Usuario"] == usuario
-        estilo = []
+        es_leader = mostrar_podio and idx == 1
+        usuario_sesion = st.session_state.get("usuario_nombre", "")
+        es_usuario = row["Usuario"] == usuario_sesion
+        css = ""
         if es_leader:
-            estilo.append("background-color: rgba(0, 255, 65, 0.12)")
+            css += "background-color: rgba(212, 175, 55, 0.12);"
         if es_usuario:
-            estilo.append("font-weight: bold")
-        return estilo
+            css += "font-weight: bold;"
+        return [css] * len(row)
 
     df_display = df.copy()
     df_display.insert(0, "", df_display["Usuario"].map(banderas).fillna(""))
