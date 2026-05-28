@@ -4,7 +4,7 @@ st.set_page_config(
     page_title="Quinela Co-fatales 2026",
     page_icon="⚽",
     layout="centered",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 from src.conexion_sheets import conectar_google_sheets
@@ -42,9 +42,32 @@ def main():
     )
     st.caption("Mundial 2026 — La apuesta de los amigos")
 
-    st.divider()
-
     pestana = st.session_state.get("navegacion", "Dashboard")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        activo = pestana == "Dashboard"
+        if st.button("📊 Dashboard", use_container_width=True,
+                     type="primary" if activo else "secondary",
+                     key="nav_dashboard"):
+            st.session_state.navegacion = "Dashboard"
+            st.rerun()
+    with col2:
+        activo = pestana == "Oráculo IA"
+        if st.button("🔮 Oráculo IA", use_container_width=True,
+                     type="primary" if activo else "secondary",
+                     key="nav_oraculo"):
+            st.session_state.navegacion = "Oráculo IA"
+            st.rerun()
+    with col3:
+        activo = pestana == "Ranking"
+        if st.button("🏆 Ranking", use_container_width=True,
+                     type="primary" if activo else "secondary",
+                     key="nav_ranking"):
+            st.session_state.navegacion = "Ranking"
+            st.rerun()
+
+    st.divider()
 
     if pestana == "Dashboard":
         renderizar_dashboard(hoja)

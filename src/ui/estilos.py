@@ -41,21 +41,14 @@ def aplicar_estilos_modernos():
             transform: scale(1.03);
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
         }
-        div.stRadio > div[role="radiogroup"] > label {
-            padding: 8px 16px;
-            border-radius: 10px;
-            background: #1a1f26;
-            border: 1px solid #2a2a2a;
-            margin: 4px 0;
-            transition: all 0.2s;
-            cursor: pointer;
+        div.stButton > button[kind="secondary"] {
+            background: #1a1f26 !important;
+            color: #CCC !important;
+            border: 1px solid #333 !important;
         }
-        div.stRadio > div[role="radiogroup"] > label:hover {
-            border-color: #D4AF37;
-            background: #1e2329;
-        }
-        div.stRadio > div[role="radiogroup"] > label > div:first-child {
-            display: none !important;
+        div.stButton > button[kind="secondary"]:hover {
+            border-color: #D4AF37 !important;
+            color: #FAFAFA !important;
         }
         </style>
         """,
