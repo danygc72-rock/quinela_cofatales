@@ -44,28 +44,24 @@ def main():
 
     pestana = st.session_state.get("navegacion", "Dashboard")
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        activo = pestana == "Dashboard"
-        if st.button("📊 Dashboard", use_container_width=True,
-                     type="primary" if activo else "secondary",
-                     key="nav_dashboard"):
-            st.session_state.navegacion = "Dashboard"
-            st.rerun()
-    with col2:
-        activo = pestana == "Oráculo IA"
-        if st.button("🔮 Oráculo IA", use_container_width=True,
-                     type="primary" if activo else "secondary",
-                     key="nav_oraculo"):
-            st.session_state.navegacion = "Oráculo IA"
-            st.rerun()
-    with col3:
-        activo = pestana == "Ranking"
-        if st.button("🏆 Ranking", use_container_width=True,
-                     type="primary" if activo else "secondary",
-                     key="nav_ranking"):
-            st.session_state.navegacion = "Ranking"
-            st.rerun()
+    if "nav_anterior" not in st.session_state:
+        st.session_state.nav_anterior = pestana
+
+    if st.session_state.nav_anterior != pestana:
+        st.session_state.nav_anterior = pestana
+        st.markdown(
+            """
+            <script>
+            setTimeout(function() {
+                var btn = window.parent.document.querySelector(
+                    '[data-testid="stSidebar"] button[data-testid="baseButton-header"]'
+                );
+                if (btn) btn.click();
+            }, 50);
+            </script>
+            """,
+            unsafe_allow_html=True,
+        )
 
     st.divider()
 

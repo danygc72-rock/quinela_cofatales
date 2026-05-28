@@ -121,6 +121,13 @@ def renderizar_sidebar_usuario():
         unsafe_allow_html=True,
     )
     st.sidebar.divider()
+    st.sidebar.radio(
+        "Navegación",
+        options=["Dashboard", "Oráculo IA", "Ranking"],
+        key="navegacion",
+        label_visibility="collapsed",
+    )
+    st.sidebar.divider()
     if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
         for k in ["autenticado", "usuario_data", "usuario_nombre", "mostrar_ticket"]:
             st.session_state.pop(k, None)

@@ -50,6 +50,22 @@ def aplicar_estilos_modernos():
             border-color: #D4AF37 !important;
             color: #FAFAFA !important;
         }
+        div.stRadio > div[role="radiogroup"] > label {
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: #1a1f26;
+            border: 1px solid #2a2a2a;
+            margin: 4px 0;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        div.stRadio > div[role="radiogroup"] > label:hover {
+            border-color: #D4AF37;
+            background: #1e2329;
+        }
+        div.stRadio > div[role="radiogroup"] > label > div:first-child {
+            display: none !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
